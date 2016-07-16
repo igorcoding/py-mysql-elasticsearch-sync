@@ -28,6 +28,13 @@ mapping:
   _id: myid
   es_field_name: mysql_column_name
 
+# If you want to cast your column value to another type, put the column name as the key, and type as the value,
+# Supported types: string(str), int, boolean(bool), json
+type_map:
+  id: string
+  author_id: string
+  attachments: json
+
 # You can set ignoring fields here, and these fields will not be post to ES.
 ignoring:
   - ignoring_field

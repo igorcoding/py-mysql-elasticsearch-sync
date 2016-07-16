@@ -31,8 +31,6 @@ from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.row_event import DeleteRowsEvent, UpdateRowsEvent, WriteRowsEvent
 from pymysqlreplication.event import RotateEvent
 
-__version__ = '0.3.4'
-
 
 # The magic spell for removing invalid characters in xml stream.
 REMOVE_INVALID_PIPE = r'tr -d "\00\01\02\03\04\05\06\07\10\13\14\16\17\20\21\22\23\24\25\26\27\30\31\32\33\34\35\36\37"'
@@ -93,6 +91,8 @@ class ElasticSync(object):
         else:
             self.id_key = None
 
+        self.type_map = self._configure_type_map(self.config.get('type_map') or {})
+
         self.ignoring = self.config.get('ignoring') or []
 
         record_path = self.config['binlog_sync']['record_file']
@@ -121,6 +121,23 @@ class ElasticSync(object):
 
         signal.signal(signal.SIGINT, cleanup)
         signal.signal(signal.SIGTERM, cleanup)
+
+    @staticmethod
+    def _configure_type_map(type_map):
+        new_type_map = {}
+        for field, type_name in type_map.items():
+
+            if type_name == 'str' or type_name == 'string':
+                new_type_map[field] = lambda x: str(x) if x is not None else None
+            elif type_name == 'int':
+                new_type_map[field] = lambda x: int(x) if x is not None else None
+            elif type_name == 'bool' or type_name == 'boolean':
+                new_type_map[field] = lambda x: bool(x) if x is not None else None
+            elif type_name == 'json':
+                new_type_map[field] = lambda x: json.loads(x) if x is not None else None
+            else:
+                new_type_map[field] = None
+        return new_type_map
 
     def _post_to_es(self, data):
         """
@@ -223,6 +240,11 @@ class ElasticSync(object):
         mapping old key to new key
         """
         for item in data:
+            for k, v in item['doc'].items():
+                field_mapper = self.type_map.get(k)
+                if field_mapper is not None:
+                    item['doc'][k] = field_mapper(v)
+
             if self.mapping:
                 for k, v in self.mapping.items():
                     item['doc'][k] = item['doc'][v]

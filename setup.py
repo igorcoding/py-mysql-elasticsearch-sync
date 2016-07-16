@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
-import es_sync
+
+__version__ = '0.3.4'
 
 setup(
     name='py-mysql-elasticsearch-sync',
-    version=es_sync.__version__,
+    version=__version__,
     packages=find_packages(),
     url='https://github.com/zhongbiaodev/py-mysql-elasticsearch-sync',
     license='MIT',
