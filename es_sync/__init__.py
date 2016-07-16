@@ -49,15 +49,19 @@ class ElasticSync(object):
         rv = bool(self.log_file and self.log_pos)
         return rv
 
-    def __init__(self, config_path=None):
-        self.config_path = config_path
-        if self.config_path is None:
-            self.config_path = sys.argv[1]
-        try:
-            self.config = yaml.load(open(self.config_path))
-        except IndexError:
-            print('Error: not specify config file')
-            exit(1)
+    def __init__(self, config_path=None, config=None):
+        if config is not None:
+            self.config_path = None
+            self.config = config
+        else:
+            self.config_path = config_path
+            if self.config_path is None:
+                self.config_path = sys.argv[1]
+            try:
+                self.config = yaml.load(open(self.config_path))
+            except IndexError:
+                print('Error: not specify config file')
+                exit(1)
 
         mysql = self.config.get('mysql')
         if mysql.get('table'):
