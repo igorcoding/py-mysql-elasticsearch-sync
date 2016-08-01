@@ -65,6 +65,8 @@ class ElasticSync(object):
                 print('Error: not specify config file')
                 exit(1)
 
+        self._init_logging()
+
         mysql = self.config.get('mysql')
         if mysql.get('table'):
             self.tables = [mysql.get('table')]
@@ -78,9 +80,9 @@ class ElasticSync(object):
             self.dump_cmd = 'mysqldump -h {host} -P {port} -u {user} --password={password} --database {db} --tables {tables} ' \
                         '--default-character-set=utf8 -X --opt --quick'.format(**mysql)
         else:
-            print('Error: must specify either table or tables')
+            logging.error('Error: must specify either table or tables')
             exit(1)
-        print('mysqldump command: {}'.format(self.dump_cmd))
+        logging.info('mysqldump command: {}'.format(self.dump_cmd))
         self.master = self.tables[0]  # use the first table as master
         self.current_table = None
 
@@ -114,8 +116,6 @@ class ElasticSync(object):
 
         self.bulk_size = self.config.get('elastic').get('bulk_size') or DEFAULT_BULKSIZE
         self.binlog_bulk_size = self.config.get('elastic').get('binlog_bulk_size') or DEFAULT_BINLOG_BULKSIZE
-
-        self._init_logging()
 
     def _init_logging(self):
         logging.basicConfig(filename=self.config['logging']['file'],
