@@ -160,7 +160,7 @@ class ElasticSync(object):
             logging.error('Got invalid response from elastic: ' + resp.text)
             raise
         if resp.get('errors'):  # a boolean to figure error occurs
-            for item in resp.json()['items']:
+            for item in resp['items']:
                 if list(item.values())[0].get('error'):
                     logging.error(item)
         else:
