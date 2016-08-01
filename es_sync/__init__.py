@@ -82,7 +82,7 @@ class ElasticSync(object):
         else:
             logging.error('Error: must specify either table or tables')
             exit(1)
-        logging.info('mysqldump command: {}'.format(self.dump_cmd))
+        # logging.info('mysqldump command: {}'.format(self.dump_cmd))
         self.master = self.tables[0]  # use the first table as master
         self.current_table = None
 
