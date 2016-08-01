@@ -1,6 +1,8 @@
 from __future__ import print_function, unicode_literals
-from future.builtins import str, range
+
 import sys
+
+from future.builtins import str, range
 
 PY2 = sys.version_info[0] == 2
 
@@ -78,6 +80,7 @@ class ElasticSync(object):
         else:
             print('Error: must specify either table or tables')
             exit(1)
+        print('mysqldump command: {}'.format(self.dump_cmd))
         self.master = self.tables[0]  # use the first table as master
         self.current_table = None
 
