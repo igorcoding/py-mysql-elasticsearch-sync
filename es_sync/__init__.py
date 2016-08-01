@@ -157,7 +157,7 @@ class ElasticSync(object):
         try:
             resp = resp.json()
         except json.decoder.JSONDecodeError:
-            logging.error('Got invalid response from elastic: ' + resp)
+            logging.error('Got invalid response from elastic: ' + resp.text)
             raise
         if resp.get('errors'):  # a boolean to figure error occurs
             for item in resp.json()['items']:
