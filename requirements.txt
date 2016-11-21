@@ -1,4 +1,4 @@
-PyMySQL==0.6.7
+PyMySQL>=0.6.7
 mysql-replication>=0.8
 requests>=2.9.1
 PyYAML>=3.11
