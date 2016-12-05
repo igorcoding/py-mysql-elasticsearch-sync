@@ -119,6 +119,7 @@ class ElasticSync(object):
 
         self.bulk_size = self.config.get('elastic').get('bulk_size') or DEFAULT_BULKSIZE
         self.binlog_bulk_size = self.config.get('elastic').get('binlog_bulk_size') or DEFAULT_BINLOG_BULKSIZE
+        self.ignore_es_already_exists = self.config.get('elastic').get('ignore_already_exists', False)
 
     def _init_logging(self):
         logging.basicConfig(filename=self.config['logging']['file'],
@@ -162,11 +163,20 @@ class ElasticSync(object):
         except json.decoder.JSONDecodeError:
             logging.error('Got invalid response from elastic: ' + resp.text)
             raise
+        
+        do_save_binlog_record = True
         if resp.get('errors'):  # a boolean to figure error occurs
             for item in resp['items']:
                 if list(item.values())[0].get('error'):
-                    logging.error(item)
-        else:
+                    item_status = item.get('create', {}).get('status')
+                    if item_status != 409:
+                        do_save_binlog_record = False
+                        logging.error(item)
+                    else:
+                        if not self.ignore_es_already_exists:
+                            do_save_binlog_record = False
+                        
+        if do_save_binlog_record:
             self._save_binlog_record()
 
     def _bulker(self, bulk_size):

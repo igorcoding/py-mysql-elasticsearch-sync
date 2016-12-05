@@ -17,6 +17,7 @@ elastic:
   binlog_bulk_size: 10  # the update bulk size when syncing binlog, default is 1 if not specified
   index: article
   type: article
+  ignore_already_exists: false  # ignores 409 (document already exists) in elastic, default = false
 
 # path to your own xml file, if you want to initialize dump from xml file. run with argument --fromfile in command
 xml_file:
