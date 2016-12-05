@@ -15,4 +15,4 @@ install:
   - pip install -r requirements.txt
 script:
   - python setup.py sdist
-  - package_cloud push igorcoding/py ./dist/*
+  - package_cloud push igorcoding/py/python/python ./dist/*
