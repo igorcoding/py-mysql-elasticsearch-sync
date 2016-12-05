@@ -28,6 +28,7 @@ import logging
 import shlex
 import datetime
 import decimal
+import time
 from lxml.etree import iterparse
 from functools import reduce
 from pymysqlreplication import BinLogStreamReader
@@ -149,6 +150,8 @@ class ElasticSync(object):
                 new_type_map[field] = lambda x: bool(x) if x is not None else None
             elif type_name == 'json':
                 new_type_map[field] = lambda x: json.loads(x) if x is not None else None
+            elif type_name == 'unixtime':
+                new_type_map[field] = lambda x: int(time.mktime(datetime.datetime.strptime(x, '%Y-%m-%dT%H:%M:%S').timetuple())) if x is not None else None
             else:
                 new_type_map[field] = None
         return new_type_map
@@ -168,8 +171,8 @@ class ElasticSync(object):
         if resp.get('errors'):  # a boolean to figure error occurs
             for item in resp['items']:
                 if list(item.values())[0].get('error'):
-                    item_status = item.get('create', {}).get('status')
-                    if item_status != 409:
+                    item_create_status = item.get('create', {}).get('status')
+                    if item_create_status != 409:
                         do_save_binlog_record = False
                         logging.error(item)
                     else:

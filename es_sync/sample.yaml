@@ -30,7 +30,7 @@ mapping:
   es_field_name: mysql_column_name
 
 # If you want to cast your column value to another type, put the column name as the key, and type as the value,
-# Supported types: string(str), int, boolean(bool), json
+# Supported types: string(str), int, boolean(bool), json, unixtime
 type_map:
   id: string
   author_id: string
