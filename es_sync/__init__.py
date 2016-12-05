@@ -151,7 +151,7 @@ class ElasticSync(object):
             elif type_name == 'json':
                 new_type_map[field] = lambda x: json.loads(x) if x is not None else None
             elif type_name == 'unixtime':
-                new_type_map[field] = lambda x: int(time.mktime(x)) if x is not None else None
+                new_type_map[field] = lambda x: int(time.mktime(x.timetuple())) if x is not None else None
             else:
                 new_type_map[field] = None
         return new_type_map
