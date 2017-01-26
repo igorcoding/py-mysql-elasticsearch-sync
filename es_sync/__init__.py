@@ -161,11 +161,14 @@ class ElasticSync(object):
         send post requests to es restful api
         """
         resp = requests.post(self.endpoint, data=data)
-        try:
-            resp = resp.json()
-        except json.decoder.JSONDecodeError:
-            logging.error('Got invalid response from elastic: ' + resp.text)
-            raise
+        while True:
+            try:
+                resp = resp.json()
+                break
+            except json.decoder.JSONDecodeError:
+                logging.error('Got invalid response from elastic: ' + resp.text)
+                time.sleep(1)
+                continue
         
         do_save_binlog_record = True
         if resp.get('errors'):  # a boolean to figure error occurs
